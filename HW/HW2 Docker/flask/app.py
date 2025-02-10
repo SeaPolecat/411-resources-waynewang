@@ -13,6 +13,7 @@ def hello():
     )
     return response
 
+# adding an 'input' parameter
 # call like http://localhost:5002/repeat?input=blahblahblah
 @app.route('/repeat')
 def input_anything():
@@ -21,6 +22,18 @@ def input_anything():
     response = make_response(
         {
             'body': input,
+            'status': 200
+        }
+    )
+    return response
+
+# expose on multiple endpoints
+@app.route('/health')
+@app.route('/healthcheck')
+def health():
+    response = make_response(
+        {
+            'response': 'OKAY',
             'status': 200
         }
     )
