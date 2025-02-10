@@ -1,4 +1,4 @@
-from flask import Flask, make_response
+from flask import Flask, make_response, request
 import os
 
 app = Flask(__name__)
@@ -8,6 +8,19 @@ def hello():
     response = make_response(
         {
             'response': 'Hello, World!',
+            'status': 200
+        }
+    )
+    return response
+
+# call like http://localhost:5002/repeat?input=blahblahblah
+@app.route('/repeat')
+def input_anything():
+    input = request.args.get('input')
+
+    response = make_response(
+        {
+            'body': input,
             'status': 200
         }
     )
