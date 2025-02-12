@@ -4,10 +4,11 @@ FROM ubuntu:22.04
 # Set the working directory inside the container
 WORKDIR /app
 
-# Update and install system dependencies
+# Update and install system dependencies (including curl so we can do healthcheck)
 RUN apt-get update && apt-get install -y \
     python3 \
-    python3-pip
+    python3-pip \
+    curl
 
 # Copy the current directory contents into the container at /app
 COPY . /app
@@ -28,5 +29,5 @@ EXPOSE ${PORT}
 CMD ["python3", "app.py"]
 
 # Health check (checks every 30 seconds to see if the endpoint returns a successful response)
-# HEALTHCHECK --interval=30s --timeout=3s \
-#  CMD curl -f http://localhost:5000/healthcheck || exit 1
+HEALTHCHECK --interval=30s --timeout=3s \
+CMD curl -f http://localhost:${PORT}/healthcheck || exit 1
