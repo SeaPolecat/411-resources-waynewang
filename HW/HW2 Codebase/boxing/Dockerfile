@@ -25,7 +25,7 @@ COPY ./sql/init_db.sql /app/sql/init_db.sql
 RUN chmod +x /app/sql/create_db.sh
 
 # Define a volume for persisting the database
-VOLUME ["/app/db"]
+VOLUME ["/app/data"]
 
 # Make port 5002 available to the world outside this container
 EXPOSE 5002
