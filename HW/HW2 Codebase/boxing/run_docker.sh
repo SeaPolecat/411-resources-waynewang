@@ -5,7 +5,7 @@ IMAGE_NAME=hw2-image
 CONTAINER_TAG=1.0
 HOST_PORT=5002
 CONTAINER_PORT=5002
-DB_VOLUME_PATH=my_volume # Adjust this to the desired host path for the database persistence
+DB_VOLUME_PATH=hw2-volume # Adjust this to the desired host path for the database persistence
 BUILD=true # Set this to true if you want to build the image
 
 # Check if we need to build the Docker image
