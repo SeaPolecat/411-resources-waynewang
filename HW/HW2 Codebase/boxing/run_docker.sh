@@ -50,7 +50,7 @@ echo "Running Docker container..."
 
 docker run -d \
 -p ${HOST_PORT}:${CONTAINER_PORT} \
--v ${DB_VOLUME_PATH}:/app/data \
+-v ${DB_VOLUME_PATH}:/app/db \
 --name ${IMAGE_NAME}_container \
 ${IMAGE_NAME}:${CONTAINER_TAG}
 
