@@ -25,10 +25,13 @@ COPY ./sql/init_db.sql /app/sql/init_db.sql
 RUN chmod +x /app/sql/create_db.sh
 
 # Define a volume for persisting the database
-VOLUME ["/app/data"]
+VOLUME ["/app/db"]
+
+# Set DB_PATH to the database within the volume
+ENV DB_PATH="/app/db/boxing.db"
 
 # Make port 5002 available to the world outside this container
 EXPOSE 5002
 
-# Run the entrypoint script when the container launches
-CMD ["/app/entrypoint.sh"]
+# Run the create_db and entrypoint script when the container launches
+CMD ["/bin/bash", "-c", "/app/sql/create_db.sh && /app/entrypoint.sh"]
