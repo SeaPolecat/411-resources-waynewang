@@ -49,7 +49,7 @@ def mock_cursor(mocker):
 
 ######################################################
 #
-#    Add and delete
+#    create_boxer
 #
 ######################################################
 
@@ -202,3 +202,80 @@ def test_get_boxer_by_bad_name(mock_cursor):
     
     with pytest.raises(ValueError, match="Boxer 'wiwiwi' not found."):
         get_boxer_by_name("wiwiwi")
+
+
+######################################################
+#
+#    update_boxer_stats
+#
+######################################################
+
+
+def test_update_boxer_stats_win(mock_cursor):
+    """
+    Test updating the stats of a boxer when they won.
+    """
+    mock_cursor.fetchone.return_value = True
+
+    boxer_id = 1
+    result = 'win'
+    update_boxer_stats(boxer_id, result)
+
+    expected_query = normalize_whitespace("""
+        UPDATE boxers SET fights = fights + 1, wins = wins + 1 WHERE id = ?
+    """)
+    actual_query = normalize_whitespace(mock_cursor.execute.call_args_list[1][0][0])
+
+    assert actual_query == expected_query, "The SQL query did not match the expected structure."
+
+    actual_arguments = mock_cursor.execute.call_args_list[1][0][1]
+    expected_arguments = (boxer_id,)
+
+    assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
+
+
+def test_update_boxer_stats_loss(mock_cursor):
+    """
+    Test updating the stats of a boxer when they lost.
+    """
+    mock_cursor.fetchone.return_value = True
+
+    boxer_id = 1
+    result = 'loss'
+    update_boxer_stats(boxer_id, result)
+
+    expected_query = normalize_whitespace("""
+        UPDATE boxers SET fights = fights + 1 WHERE id = ?
+    """)
+    actual_query = normalize_whitespace(mock_cursor.execute.call_args_list[1][0][0])
+
+    assert actual_query == expected_query, "The SQL query did not match the expected structure."
+
+    actual_arguments = mock_cursor.execute.call_args_list[1][0][1]
+    expected_arguments = (boxer_id,)
+
+    assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
+
+
+def test_update_boxer_stats_invalid_id(mock_cursor):
+    """
+    Test error when trying to update the stats of a boxer that does not exist.
+    """
+    mock_cursor.fetchone.return_value = None
+    
+    with pytest.raises(ValueError, match="Boxer with ID HUH not found."):
+        boxer_id = 'HUH'
+        result = 'loss'
+        update_boxer_stats(boxer_id, result)
+
+
+def test_update_boxer_stats_invalid_result(mock_cursor):
+    """
+    Test error when trying to update the stats of a boxer with an invalid result.
+    """
+    mock_cursor.fetchone.return_value = True
+    
+    with pytest.raises(ValueError, match="Invalid result: and they both died. Expected 'win' or 'loss'."):
+        boxer_id = 1
+        result = 'and they both died'
+        update_boxer_stats(boxer_id, result)
