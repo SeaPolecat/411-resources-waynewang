@@ -127,41 +127,45 @@ def test_create_boxer_duplicate(mock_cursor):
 #
 ######################################################
 
-'''
+
 def test_get_leaderboard_sort_by_wins(mock_cursor):
     """
     Test getting the leaderboard, if it's sorted by wins.
     """
+
     mock_cursor.fetchall.return_value = [
-        (1, "Wayne", 200, 100, 5, 20, 5, 4, 0.8)
+        (1, "Wayne", 200, 100, 5, 20, 5, 4, 4/5)
     ]
 
     leaderboard = get_leaderboard(sort_by="wins")
 
-    expected_result = [{
-        'id': 1,
-        'name': 'Wayne',
-        'weight': 200,
-        'height': 100,
-        'reach': 5,
-        'age': 20,
-        'weight_class': get_weight_class(200),  # Calculate weight class
-        'fights': 5,
-        'wins': 4,
-        'win_pct': round(4/5 * 100, 1)  # Convert to percentage
-    }]
+    expected_result = [
+        {
+            'id': 1,
+            'name': 'Wayne',
+            'weight': 200,
+            'height': 100,
+            'reach': 5,
+            'age': 20,
+            'weight_class': get_weight_class(200),  # Calculate weight class
+            'fights': 5,
+            'wins': 4,
+            'win_pct': round(4/5 * 100, 1)  # Convert to percentage
+        } 
+    ]
 
     assert leaderboard == expected_result, f"Expected {expected_result}, but got {leaderboard}"
 
     expected_query = normalize_whitespace("""
-        SELECT id, name, weight, height, reach, age, fights, wins, win_pct
-        BY wins DESC
+        SELECT id, name, weight, height, reach, age, fights, wins,
+               (wins * 1.0 / fights) AS win_pct
         FROM boxers
+        WHERE fights > 0
+        ORDER BY wins DESC
     """)
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
-    assert actual_query == expected_query, "The SQL query did not match the expected structure."'
-'''
+    assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
 
 ######################################################
