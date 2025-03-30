@@ -121,3 +121,84 @@ def test_create_boxer_duplicate(mock_cursor):
         create_boxer(name="Wayne", weight=150, height=200, reach=4, age=30)
 
 
+######################################################
+#
+#    get_leaderboard
+#
+######################################################
+
+'''
+def test_get_leaderboard_sort_by_wins(mock_cursor):
+    """
+    Test getting the leaderboard, if it's sorted by wins.
+    """
+    mock_cursor.fetchall.return_value = [
+        (1, "Wayne", 200, 100, 5, 20, 5, 4, 0.8)
+    ]
+
+    leaderboard = get_leaderboard(sort_by="wins")
+
+    expected_result = [{
+        'id': 1,
+        'name': 'Wayne',
+        'weight': 200,
+        'height': 100,
+        'reach': 5,
+        'age': 20,
+        'weight_class': get_weight_class(200),  # Calculate weight class
+        'fights': 5,
+        'wins': 4,
+        'win_pct': round(4/5 * 100, 1)  # Convert to percentage
+    }]
+
+    assert leaderboard == expected_result, f"Expected {expected_result}, but got {leaderboard}"
+
+    expected_query = normalize_whitespace("""
+        SELECT id, name, weight, height, reach, age, fights, wins, win_pct
+        BY wins DESC
+        FROM boxers
+    """)
+    actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
+
+    assert actual_query == expected_query, "The SQL query did not match the expected structure."'
+'''
+
+
+######################################################
+#
+#    get_boxer_by_name
+#
+######################################################
+
+
+def test_get_boxer_by_name(mock_cursor):
+    """
+    Test getting a boxer by name.
+    """
+    mock_cursor.fetchone.return_value = (1, "Wayne", 200, 100, 5, 20)
+
+    result = get_boxer_by_name("Wayne")
+
+    expected_result = Boxer(1, "Wayne", 200, 100, 5, 20)
+
+    assert result == expected_result, f"Expected {expected_result}, got {result}"
+
+    expected_query = normalize_whitespace("SELECT id, name, weight, height, reach, age FROM boxers WHERE name = ?")
+    actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
+
+    assert actual_query == expected_query, "The SQL query did not match the expected structure."
+
+    actual_arguments = mock_cursor.execute.call_args[0][1]
+    expected_arguments = ("Wayne",)
+
+    assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
+
+
+def test_get_boxer_by_bad_name(mock_cursor):
+    """
+    Test error when getting a non-existent boxer.
+    """
+    mock_cursor.fetchone.return_value = None
+    
+    with pytest.raises(ValueError, match="Boxer 'wiwiwi' not found."):
+        get_boxer_by_name("wiwiwi")
