@@ -128,30 +128,22 @@ def test_create_boxer_duplicate(mock_cursor):
 ######################################################
 
 
-def test_get_leaderboard_sort_by_wins(mock_cursor):
+def test_get_leaderboard_ordered_by_wins(mock_cursor):
     """
-    Test getting the leaderboard, if it's sorted by wins.
+    Test getting the leaderboard, if it's ordered by wins.
     """
-
     mock_cursor.fetchall.return_value = [
-        (1, "Wayne", 200, 100, 5, 20, 5, 4, 4/5)
+        (2, "Jake", 150, 120, 6, 34, 16, 11, 11/16),
+        (1, "Wayne", 200, 100, 5, 20, 5, 4, 4/5),
+        (3, "Pikachu", 169, 90, 3, 25, 3, 2, 2/3)
     ]
 
-    leaderboard = get_leaderboard(sort_by="wins")
+    leaderboard = get_leaderboard()
 
     expected_result = [
-        {
-            'id': 1,
-            'name': 'Wayne',
-            'weight': 200,
-            'height': 100,
-            'reach': 5,
-            'age': 20,
-            'weight_class': get_weight_class(200),  # Calculate weight class
-            'fights': 5,
-            'wins': 4,
-            'win_pct': round(4/5 * 100, 1)  # Convert to percentage
-        } 
+        {'id': 2, 'name': 'Jake', 'weight': 150, 'height': 120, 'reach': 6, 'age': 34, 'weight_class': get_weight_class(150), 'fights': 16, 'wins': 11, 'win_pct': round(11/16 * 100, 1)},
+        {'id': 1, 'name': 'Wayne', 'weight': 200, 'height': 100, 'reach': 5, 'age': 20, 'weight_class': get_weight_class(200), 'fights': 5, 'wins': 4, 'win_pct': round(4/5 * 100, 1)},
+        {'id': 3, 'name': 'Pikachu', 'weight': 169, 'height': 90, 'reach': 3, 'age': 25, 'weight_class': get_weight_class(169), 'fights': 3, 'wins': 2, 'win_pct': round(2/3 * 100, 1)}
     ]
 
     assert leaderboard == expected_result, f"Expected {expected_result}, but got {leaderboard}"
@@ -166,6 +158,46 @@ def test_get_leaderboard_sort_by_wins(mock_cursor):
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
+
+
+def test_get_leaderboard_ordered_by_win_pct(mock_cursor):
+    """
+    Test getting the leaderboard, if it's ordered by win percentage.
+    """
+    mock_cursor.fetchall.return_value = [
+        (1, "Wayne", 200, 100, 5, 20, 5, 4, 4/5), # 80%
+        (2, "Jake", 150, 120, 6, 34, 16, 11, 11/16), # 68.8%
+        (3, "Pikachu", 169, 90, 3, 25, 3, 2, 2/3) # 66.7%
+    ]
+
+    leaderboard = get_leaderboard(sort_by='win_pct')
+
+    expected_result = [
+        {'id': 1, 'name': 'Wayne', 'weight': 200, 'height': 100, 'reach': 5, 'age': 20, 'weight_class': get_weight_class(200), 'fights': 5, 'wins': 4, 'win_pct': round(4/5 * 100, 1)},
+        {'id': 2, 'name': 'Jake', 'weight': 150, 'height': 120, 'reach': 6, 'age': 34, 'weight_class': get_weight_class(150), 'fights': 16, 'wins': 11, 'win_pct': round(11/16 * 100, 1)},
+        {'id': 3, 'name': 'Pikachu', 'weight': 169, 'height': 90, 'reach': 3, 'age': 25, 'weight_class': get_weight_class(169), 'fights': 3, 'wins': 2, 'win_pct': round(2/3 * 100, 1)}
+    ]
+
+    assert leaderboard == expected_result, f"Expected {expected_result}, but got {leaderboard}"
+
+    expected_query = normalize_whitespace("""
+        SELECT id, name, weight, height, reach, age, fights, wins,
+               (wins * 1.0 / fights) AS win_pct
+        FROM boxers
+        WHERE fights > 0
+        ORDER BY win_pct DESC
+    """)
+    actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
+
+    assert actual_query == expected_query, "The SQL query did not match the expected structure."
+
+
+def test_get_leaderboard_invalid_sort_by(mock_cursor):
+    """
+    Test error when trying to get the leaderboard with an invalid sort_by parameter
+    """
+    with pytest.raises(ValueError, match="Invalid sort_by parameter: wahwahwah"):
+        get_leaderboard("wahwahwah")
 
 
 ######################################################
