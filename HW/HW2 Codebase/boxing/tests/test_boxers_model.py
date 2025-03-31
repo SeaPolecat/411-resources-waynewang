@@ -192,7 +192,7 @@ def test_get_leaderboard_ordered_by_win_pct(mock_cursor):
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
 
-def test_get_leaderboard_invalid_sort_by(mock_cursor):
+def test_get_leaderboard_invalid_sort_by():
     """
     Test error when trying to get the leaderboard with an invalid sort_by parameter
     """
