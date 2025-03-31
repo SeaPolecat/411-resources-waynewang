@@ -46,9 +46,17 @@ class RingModel:
         return winner.name
 
     def clear_ring(self):
+        """Clears the boxers from the ring. If the ring is empty, logs a warning.
+        
+        """
+        logger.info("Received request to clear the ring")
+
         if not self.ring:
+            logger.warning("Clearing an empty ring")
             return
+        
         self.ring.clear()
+        logger.info("Successfully cleared the ring")
 
     def enter_ring(self, boxer: Boxer):
         if not isinstance(boxer, Boxer):
@@ -60,10 +68,18 @@ class RingModel:
         self.ring.append(boxer)
 
     def get_boxers(self) -> List[Boxer]:
+        """Returns the boxers in the ring. If the ring is empty, logs a warning.
+
+        Returns:
+            List[Boxer]: A list of the boxers in the ring.
+
+        """
+        logger.info("Retrieving the boxers in the ring")
+
         if not self.ring:
-            pass
+            logger.warning("The ring is empty")
         else:
-            pass
+            logger.info("Successfully retrieved the boxers in the ring")
 
         return self.ring
 
