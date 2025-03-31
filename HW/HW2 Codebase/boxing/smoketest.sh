@@ -4,7 +4,7 @@
 BASE_URL="http://localhost:5002/api"
 
 # Flag to control whether to echo JSON output
-ECHO_JSON=false
+ECHO_JSON=true
 
 # Parse command-line arguments
 while [ "$#" -gt 0 ]; do
@@ -96,6 +96,61 @@ get_boxer_by_name() {
     fi
 }
 
+# /leaderboard
+get_leaderboard() {
+    echo "Getting the leaderboard..."
+    response=$(curl -s -X GET "$BASE_URL/leaderboard")
+
+    if echo "$response" | grep -q '"status": "success"'; then
+        echo "Leaderboard retrieved successfully."
+        if [ "$ECHO_JSON" = true ]; then
+        echo "Leaderboard JSON:"
+        echo "$response" | jq .
+        fi
+    else
+        echo "Failed to get leaderboard."
+        exit 1
+    fi
+}
+
+
+###############################################
+#
+# Ring Management
+#
+###############################################
+
+
+# /clear-boxers
+clear_boxers() {
+  echo "Clearing boxers from the ring..."
+  response=$(curl -s -X POST "$BASE_URL/clear-boxers")
+
+  if echo "$response" | grep -q '"status": "success"'; then
+    echo "Boxers cleared successfully. Ring is now empty."
+  else
+    echo "Failed to clear boxers."
+    exit 1
+  fi
+}
+
+# /get-boxers
+get_boxers() {
+  echo "Retrieving boxers from the ring..."
+  response=$(curl -s -X GET "$BASE_URL/get-boxers")
+
+  if echo "$response" | grep -q '"status": "success"'; then
+    echo "Boxers retrieved successfully."
+    if [ "$ECHO_JSON" = true ]; then
+      echo "Boxers JSON:"
+      echo "$response" | jq .
+    fi
+  else
+    echo "Failed to retrieve boxers from the ring."
+    exit 1
+  fi
+}
+
 
 ###############################################
 #
@@ -109,6 +164,10 @@ check_health
 check_db
 
 # Boxer Management
-#add_boxer "wiwiwi" 200 100 5 20
-
+#add_boxer "wiwiwi" 200 100 5 20 # commented out because it causes an error from adding duplicates
 get_boxer_by_name "wiwiwi"
+get_leaderboard # may return an empty list, because a boxer needs to fight first to get on the leaderboard
+
+# Ring Management
+clear_boxers
+get_boxers
