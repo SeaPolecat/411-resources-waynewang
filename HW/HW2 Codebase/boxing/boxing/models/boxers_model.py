@@ -101,6 +101,21 @@ def delete_boxer(boxer_id: int) -> None:
 
 
 def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
+    """
+    Gets the leaderboard of boxers.
+
+    Args:
+        sort_by (str): Defines how to sort the leaderboard (in descending order).
+            Can be either 'wins' or 'win_pct' (percentage of wins). Defaults to 'wins'.
+
+    Returns:
+        List[dict[str, Any]]: A list of dictionaries representing the boxer leaderboard.
+
+    Raises:
+        ValueError: If the sort_by argument is invalid.
+        sqlite3.Error: If any database error occurs.
+
+    """
     query = """
         SELECT id, name, weight, height, reach, age, fights, wins,
                (wins * 1.0 / fights) AS win_pct
@@ -118,6 +133,9 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
+            
+            logger.info("Attempting to retrieve the leaderboard...")
+
             cursor.execute(query)
             rows = cursor.fetchall()
 
@@ -137,9 +155,11 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
             }
             leaderboard.append(boxer)
 
+        logger.info(f"Retrieved the leaderboard containing {len(leaderboard)} boxers.")
         return leaderboard
 
     except sqlite3.Error as e:
+        logger.error(f"Database error while retrieving the leaderboard: {e}")
         raise e
 
 
