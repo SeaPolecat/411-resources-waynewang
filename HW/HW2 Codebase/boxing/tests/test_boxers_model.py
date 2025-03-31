@@ -75,7 +75,7 @@ def test_create_boxer(mock_cursor):
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 
-def test_create_boxer_invalid_weight(mock_cursor):
+def test_create_boxer_invalid_weight():
     """
     Test error when trying to create a boxer with an invalid weight (e.g., weight below 125)  
     """
@@ -83,7 +83,7 @@ def test_create_boxer_invalid_weight(mock_cursor):
         create_boxer(name="Wayne", weight=100, height=100, reach=5, age=20)
 
 
-def test_create_boxer_invalid_height(mock_cursor):
+def test_create_boxer_invalid_height():
     """
     Test error when trying to create a boxer with an invalid height (e.g., height below 0)
     """
@@ -91,7 +91,7 @@ def test_create_boxer_invalid_height(mock_cursor):
         create_boxer(name="Wayne", weight=200, height=-2, reach=5, age=20)
 
 
-def test_create_boxer_invalid_reach(mock_cursor):
+def test_create_boxer_invalid_reach():
     """
     Test error when trying to create a boxer with an invalid reach (e.g., raech below 0)
     """
@@ -99,7 +99,7 @@ def test_create_boxer_invalid_reach(mock_cursor):
         create_boxer(name="Wayne", weight=200, height=100, reach=-12, age=20)
 
 
-def test_create_boxer_invalid_age(mock_cursor):
+def test_create_boxer_invalid_age():
     """
     Test error when trying to create a boxer with an invalid age (e.g., age not between 18 and 40)
     """
@@ -219,7 +219,10 @@ def test_get_boxer_by_name(mock_cursor):
 
     assert result == expected_result, f"Expected {expected_result}, got {result}"
 
-    expected_query = normalize_whitespace("SELECT id, name, weight, height, reach, age FROM boxers WHERE name = ?")
+    expected_query = normalize_whitespace("""
+        SELECT id, name, weight, height, reach, age
+        FROM boxers WHERE name = ?
+    """)
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
@@ -249,7 +252,7 @@ def test_get_boxer_by_bad_name(mock_cursor):
 
 def test_update_boxer_stats_win(mock_cursor):
     """
-    Test updating the stats of a boxer when they won.
+    Test updating the stats of a boxer if they won.
     """
     mock_cursor.fetchone.return_value = True
 
@@ -272,7 +275,7 @@ def test_update_boxer_stats_win(mock_cursor):
 
 def test_update_boxer_stats_loss(mock_cursor):
     """
-    Test updating the stats of a boxer when they lost.
+    Test updating the stats of a boxer if they lost.
     """
     mock_cursor.fetchone.return_value = True
 
