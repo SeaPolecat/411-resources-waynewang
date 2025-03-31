@@ -26,8 +26,7 @@ class Boxer:
 
 
 def create_boxer(name: str, weight: int, height: int, reach: float, age: int) -> None:
-    """
-    Creates a new boxer in the boxers table.
+    """Creates a new boxer in the boxers table.
 
     Args:
         name (str): The boxer's name.
@@ -101,8 +100,7 @@ def delete_boxer(boxer_id: int) -> None:
 
 
 def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
-    """
-    Gets the leaderboard of boxers.
+    """Gets the leaderboard of boxers.
 
     Args:
         sort_by (str): Defines how to sort the leaderboard (in descending order).
@@ -188,9 +186,25 @@ def get_boxer_by_id(boxer_id: int) -> Boxer:
 
 
 def get_boxer_by_name(boxer_name: str) -> Boxer:
+    """Gets a boxer by their name.
+
+    Args:
+        boxer_name (str): The boxer's name.
+
+    Returns:
+        Boxer: The boxer corresponding to the boxer_name.
+
+    Raises:
+        ValueError: If the boxer is not found.
+        sqlite3.Error: If any database error occurs.
+
+    """
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
+
+            logger.info(f"Attempting to retrieve boxer named {boxer_name}")
+
             cursor.execute("""
                 SELECT id, name, weight, height, reach, age
                 FROM boxers WHERE name = ?
@@ -203,11 +217,14 @@ def get_boxer_by_name(boxer_name: str) -> Boxer:
                     id=row[0], name=row[1], weight=row[2], height=row[3],
                     reach=row[4], age=row[5]
                 )
+                logger.info(f"Boxer named {boxer_name} found")
                 return boxer
             else:
+                logger.info(f"Boxer named {boxer_name} NOT found")
                 raise ValueError(f"Boxer '{boxer_name}' not found.")
 
     except sqlite3.Error as e:
+        logger.error(f"Database error while retrieving boxer named {boxer_name}: {e}")
         raise e
 
 
