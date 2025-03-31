@@ -14,3 +14,49 @@ while [ "$#" -gt 0 ]; do
   esac
   shift
 done
+
+
+###############################################
+#
+# Health checks
+#
+###############################################
+
+
+# /health
+# Function to check the health of the service
+check_health() {
+  echo "Checking health status..."
+  curl -s -X GET "$BASE_URL/health" | grep -q '"status": "success"'
+  if [ $? -eq 0 ]; then
+    echo "Service is healthy."
+  else
+    echo "Health check failed."
+    exit 1
+  fi
+}
+
+# /db-check
+# Function to check the database connection
+check_db() {
+  echo "Checking database connection..."
+  curl -s -X GET "$BASE_URL/db-check" | grep -q '"status": "success"'
+  if [ $? -eq 0 ]; then
+    echo "Database connection is healthy."
+  else
+    echo "Database check failed."
+    exit 1
+  fi
+}
+
+
+###############################################
+#
+# Running smoketests
+#
+###############################################
+
+
+# Health checks
+check_health
+check_db
