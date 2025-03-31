@@ -97,9 +97,28 @@ get_boxer_by_name() {
 }
 
 # /leaderboard
-get_leaderboard() {
-    echo "Getting the leaderboard..."
-    response=$(curl -s -X GET "$BASE_URL/leaderboard")
+# ordered by wins, descending
+get_leaderboard_ordered_by_wins() {
+    echo "Getting the leaderboard (ordered by wins)..."
+    response=$(curl -s -X GET "$BASE_URL/leaderboard") # 'wins' is the default option
+
+    if echo "$response" | grep -q '"status": "success"'; then
+        echo "Leaderboard retrieved successfully."
+        if [ "$ECHO_JSON" = true ]; then
+        echo "Leaderboard JSON:"
+        echo "$response" | jq .
+        fi
+    else
+        echo "Failed to get leaderboard."
+        exit 1
+    fi
+}
+
+# /leaderboard
+# ordered by win_pct, descending
+get_leaderboard_ordered_by_win_pct() {
+    echo "Getting the leaderboard (ordered by win_pct)..."
+    response=$(curl -s -X GET "$BASE_URL/leaderboard?sort=win_pct")
 
     if echo "$response" | grep -q '"status": "success"'; then
         echo "Leaderboard retrieved successfully."
@@ -166,7 +185,8 @@ check_db
 # Boxer Management
 #add_boxer "wiwiwi" 200 100 5 20 # commented out because it causes an error from adding duplicates
 get_boxer_by_name "wiwiwi"
-get_leaderboard # may return an empty list, because a boxer needs to fight first to get on the leaderboard
+get_leaderboard_ordered_by_wins # may return an empty list, because a boxer needs to fight first to get on the leaderboard
+get_leaderboard_ordered_by_win_pct
 
 # Ring Management
 clear_boxers
