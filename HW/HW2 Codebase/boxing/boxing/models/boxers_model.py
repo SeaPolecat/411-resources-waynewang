@@ -110,7 +110,7 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
         List[dict[str, Any]]: A list of dictionaries representing the boxer leaderboard.
 
     Raises:
-        ValueError: If the sort_by argument is invalid.
+        ValueError: If the sort_by argument is invalid, or if the leaderboard is empty.
         sqlite3.Error: If any database error occurs.
 
     """
@@ -138,6 +138,11 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
             rows = cursor.fetchall()
 
         leaderboard = []
+
+        if not rows:
+            logger.warning("The leaderboard is empty!")
+            return []
+
         for row in rows:
             boxer = {
                 'id': row[0],
