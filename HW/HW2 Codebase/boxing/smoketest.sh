@@ -52,6 +52,34 @@ check_db() {
 
 ###############################################
 #
+# Boxer Management
+#
+###############################################
+
+
+# /add-boxer
+add_boxer() {
+    name=$1
+    weight=$2
+    height=$3
+    reach=$4
+    age=$5
+
+    echo "Adding boxer $name to the gym..."
+    curl -s -X POST "$BASE_URL/add-boxer" -H "Content-Type: application/json" \
+        -d "{\"name\":\"$name\", \"weight\":$weight, \"height\":$height, \"reach\":$reach, \"age\":$age}" | grep -q '"status": "success"'
+
+    if [ $? -eq 0 ]; then
+        echo "Boxer added successfully."
+    else
+        echo "Failed to add boxer."
+        exit 1
+    fi
+}
+
+
+###############################################
+#
 # Running smoketests
 #
 ###############################################
@@ -60,3 +88,6 @@ check_db() {
 # Health checks
 check_health
 check_db
+
+# Boxer Management
+add_boxer "Wayne" 200 100 5 20
