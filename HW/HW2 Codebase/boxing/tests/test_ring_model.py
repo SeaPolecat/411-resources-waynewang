@@ -80,3 +80,13 @@ def test_get_boxers(ring_model, sample_ring):
     assert len(boxers) == 2
     assert boxers[0].id == 1
     assert boxers[1].id == 2
+
+
+def test_get_boxers_empty_ring(ring_model, caplog):
+    """
+    Test that getting boxers from an empty ring logs a warning.
+    """
+    boxers = ring_model.get_boxers()
+
+    assert len(boxers) == 0
+    assert "The ring is empty" in caplog.text, "Expected warning about empty leaderboard not found in logs."
