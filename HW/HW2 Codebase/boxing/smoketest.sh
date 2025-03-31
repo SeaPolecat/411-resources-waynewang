@@ -77,6 +77,25 @@ add_boxer() {
     fi
 }
 
+# /get-boxer-by-name/<string:boxer_name>
+get_boxer_by_name() {
+    boxer_name=$1
+
+    echo "Getting boxer by name ($boxer_name)..."
+    response=$(curl -s -X GET "$BASE_URL/get-boxer-by-name/$boxer_name")
+
+    if echo "$response" | grep -q '"status": "success"'; then
+        echo "Boxer retrieved successfully by name ($boxer_name)."
+        if [ "$ECHO_JSON" = true ]; then
+        echo "Boxer JSON (name $boxer_name):"
+        echo "$response" | jq .
+        fi
+    else
+        echo "Failed to get boxer by name ($boxer_name)."
+        exit 1
+    fi
+}
+
 
 ###############################################
 #
@@ -90,4 +109,6 @@ check_health
 check_db
 
 # Boxer Management
-add_boxer "Wayne" 200 100 5 20
+#add_boxer "wiwiwi" 200 100 5 20
+
+get_boxer_by_name "wiwiwi"
