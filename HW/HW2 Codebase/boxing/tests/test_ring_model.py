@@ -54,6 +54,14 @@ def test_clear_ring(ring_model, sample_boxer1, sample_boxer2):
     assert len(ring_model.ring) == 0, "Ring should be empty after clearing"
 
 
+def test_clear_ring_empty_ring(ring_model, caplog):
+    """
+    Test that clearing an empty leaderboard logs a warning.
+    """
+    ring_model.clear_ring()
+    assert "Clearing an empty ring" in caplog.text, "Expected warning about empty leaderboard not found in logs."
+
+
 ######################################################
 #
 #    get_boxers
