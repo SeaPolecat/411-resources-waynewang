@@ -192,6 +192,30 @@ def test_get_leaderboard_ordered_by_win_pct(mock_cursor):
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
 
+def test_get_leaderboard_empty_leaderboard(mock_cursor, caplog):
+    """
+    Test that retrieving the leaderboard returns an empty list when the leaderboard is empty and logs a warning.
+    """
+    mock_cursor.fetchall.return_value = []
+
+    result = get_leaderboard()
+
+    assert result == [], f"Expected empty list, but got {result}"
+
+    assert "The leaderboard is empty!" in caplog.text, "Expected warning about empty leaderboard not found in logs."
+
+    expected_query = normalize_whitespace("""
+        SELECT id, name, weight, height, reach, age, fights, wins,
+               (wins * 1.0 / fights) AS win_pct
+        FROM boxers
+        WHERE fights > 0
+        ORDER BY wins DESC
+    """)
+    actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
+
+    assert actual_query == expected_query, "The SQL query did not match the expected structure."
+
+
 def test_get_leaderboard_invalid_sort_by():
     """
     Test error when trying to get the leaderboard with an invalid sort_by parameter
