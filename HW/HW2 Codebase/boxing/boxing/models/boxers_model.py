@@ -104,7 +104,7 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
 
     Args:
         sort_by (str): Defines how to sort the leaderboard (in descending order).
-            Can be either 'wins' or 'win_pct' (percentage of wins). Defaults to 'wins'.
+            Should be either 'wins' or 'win_pct' (percentage of wins). Defaults to 'wins'.
 
     Returns:
         List[dict[str, Any]]: A list of dictionaries representing the boxer leaderboard.
@@ -244,23 +244,41 @@ def get_weight_class(weight: int) -> str:
 
 
 def update_boxer_stats(boxer_id: int, result: str) -> None:
+    """Finds a boxer by their ID and increments their number of fights, and wins (if they won a fight).
+    
+    Args:
+        boxer_id (int): The ID of the boxer whose number of fights and wins should be incremented.
+        result (str): Indicates whether the boxer won or lost a fight. Should be either 'win' or 'loss'.
+
+    Raises:
+        ValueError: If the 'result' argument is invalid, or if the boxer does not exist.
+        sqlite3.Error: If any database error occurs.
+    
+    """
     if result not in {'win', 'loss'}:
+        logger.warning(f"Invalid result: {result}. Expected 'win' or 'loss'.")
         raise ValueError(f"Invalid result: {result}. Expected 'win' or 'loss'.")
 
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
+            logger.info(f"Attempting to update boxer stats for boxer with ID {boxer_id}")
 
             cursor.execute("SELECT id FROM boxers WHERE id = ?", (boxer_id,))
             if cursor.fetchone() is None:
+                logger.warning(f"Cannot update boxer stats: Boxer with ID {boxer_id} not found!")
                 raise ValueError(f"Boxer with ID {boxer_id} not found.")
 
             if result == 'win':
                 cursor.execute("UPDATE boxers SET fights = fights + 1, wins = wins + 1 WHERE id = ?", (boxer_id,))
+                logger.info(f"Added one fight and one win to boxer stats for boxer with ID {boxer_id}")
+
             else:  # result == 'loss'
                 cursor.execute("UPDATE boxers SET fights = fights + 1 WHERE id = ?", (boxer_id,))
+                logger.info(f"Added one fight to boxer stats for boxer with ID {boxer_id}")
 
             conn.commit()
 
     except sqlite3.Error as e:
+        logger.error(f"Database error while updating boxer stats for boxer with ID {boxer_id}: {e}")
         raise e
