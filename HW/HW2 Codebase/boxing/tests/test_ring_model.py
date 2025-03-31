@@ -12,9 +12,9 @@ from boxing.models.boxers_model import Boxer
 
 
 @pytest.fixture()
-def playlist_model():
+def ring_model():
     """Fixture to provide a new instance of PlaylistModel for each test."""
-    return Boxer()
+    return RingModel()
 
 '''
 @pytest.fixture
@@ -46,3 +46,11 @@ def sample_playlist(sample_song1, sample_song2):
 ######################################################
 
 
+def test_clear_ring(ring_model, sample_boxer1):
+    """
+    Test clearing the ring.
+    """
+    ring_model.ring.append(sample_boxer1)
+
+    ring_model.clear_ring()
+    assert len(ring_model.ring) == 0, "Ring should be empty after clearing"
