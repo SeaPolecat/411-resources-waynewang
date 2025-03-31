@@ -43,11 +43,12 @@ def sample_ring(sample_boxer1, sample_boxer2):
 ######################################################
 
 
-def test_clear_ring(ring_model, sample_boxer1):
+def test_clear_ring(ring_model, sample_boxer1, sample_boxer2):
     """
     Test clearing the ring.
     """
     ring_model.ring.append(sample_boxer1)
+    ring_model.ring.append(sample_boxer2)
 
     ring_model.clear_ring()
     assert len(ring_model.ring) == 0, "Ring should be empty after clearing"
@@ -67,6 +68,7 @@ def test_get_boxers(ring_model, sample_ring):
     ring_model.ring.extend(sample_ring)
 
     boxers = ring_model.get_boxers()
+    
     assert len(boxers) == 2
     assert boxers[0].id == 1
     assert boxers[1].id == 2
