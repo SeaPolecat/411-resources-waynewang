@@ -60,7 +60,21 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
 
 
 def delete_boxer(boxer_id: int) -> None:
-    try:
+
+    """
+    Deletes a boxer from the database by their boxer ID.
+
+    Args:
+        boxer_id (int): The ID of the boxer to delete.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the boxer does not exist in the database.
+    """ 
+   
+	try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
 
@@ -77,7 +91,7 @@ def delete_boxer(boxer_id: int) -> None:
 
 def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
     query = """
-        SELECT id, name, weight, height, reach, age, fights, wins,
+        SELECT id, name, weight, height, reach, age, , wins,
                (wins * 1.0 / fights) AS win_pct
         FROM boxers
         WHERE fights > 0
@@ -119,7 +133,21 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
 
 
 def get_boxer_by_id(boxer_id: int) -> Boxer:
-    try:
+        """Retrieves a song from the playlist by its song ID.
+        
+        Args:
+            song_id (int): The ID of the song to retrieve.
+        
+        Returns:
+            Song: The song with the specified ID.
+        
+        Raises:
+            ValueError: If the playlist is empty or the song is not found.
+            
+        """
+
+    
+	try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -167,6 +195,20 @@ def get_boxer_by_name(boxer_name: str) -> Boxer:
 
 
 def get_weight_class(weight: int) -> str:
+
+ """
+    Determines the weight class for a boxer based on their weight.
+
+    Args:
+        weight (int): The weight of the boxer in pounds.
+
+    Returns:
+        str: The name of the corresponding weight class.
+
+    Raises:
+        ValueError: If the weight is below the minimum valid limit (125 lbs).
+    """
+
     if weight >= 203:
         weight_class = 'HEAVYWEIGHT'
     elif weight >= 166:
