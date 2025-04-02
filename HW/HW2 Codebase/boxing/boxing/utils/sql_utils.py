@@ -36,7 +36,18 @@ def check_database_connection():
         raise Exception(error_message) from e
 
 def check_table_exists(tablename: str):
+    """
+    Check if the table exists by querying the SQLite master table.
+
+    Args:
+        tablename (str): The name of the table to check.
+
+    Raises:
+        Exception: If the table does not exist.
+
+    """
     try:
+        logger.info(f"Checking if table '{tablename}' exists in {DB_PATH}...")
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -49,10 +60,14 @@ def check_table_exists(tablename: str):
 
         if result is None:
             error_message = f"Table '{tablename}' does not exist."
+            logger.error(error_message)
             raise Exception(error_message)
+        
+        logger.info(f"Table '{tablename}' exists.")
 
     except sqlite3.Error as e:
         error_message = f"Table check error for '{tablename}': {e}"
+        logger.error(error_message)
         raise Exception(error_message) from e
 
 @contextmanager

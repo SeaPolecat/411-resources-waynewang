@@ -23,12 +23,16 @@ RUN apt-get update && apt-get install -y sqlite3
 COPY ./sql/create_db.sh /app/sql/create_db.sh
 COPY ./sql/init_db.sql /app/sql/init_db.sql
 RUN chmod +x /app/sql/create_db.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Define a volume for persisting the database
 VOLUME ["/app/db"]
 
-# Make port 5000 available to the world outside this container
-EXPOSE 5000
+# Set DB_PATH to the database within the volume
+ENV DB_PATH="/app/db/boxing.db"
 
-# Run the entrypoint script when the container launches
-CMD ["/app/entrypoint.sh"]
+# Make port 5002 available to the world outside this container
+EXPOSE 5002
+
+# Run the create_db and entrypoint script when the container launches
+CMD ["/bin/bash", "-c", "/app/sql/create_db.sh && /app/entrypoint.sh"]
