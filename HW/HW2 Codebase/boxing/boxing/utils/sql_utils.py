@@ -23,13 +23,13 @@ def check_database_connection():
         Exception: If the database connection or query execution fails.
     """
 
-logger.info("Checking database connection")
+    logger.info("Checking database connection")
 
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 	
-	logger.debug("Executing test query: SELECT 1;")
+        logger.debug("Executing test query: SELECT 1;")
         
 	# Execute a simple query to verify the connection is active
         cursor.execute("SELECT 1;")
@@ -37,7 +37,7 @@ logger.info("Checking database connection")
 
     except sqlite3.Error as e:
         logger.error(f"Database connection failed: {e}")
-	error_message = f"Database connection error: {e}"
+        error_message = f"Database connection error: {e}"
         raise Exception(error_message) from e
 
 def check_table_exists(tablename: str):
@@ -91,10 +91,10 @@ def get_db_connection():
     conn = None
     try:
         conn = sqlite3.connect(DB_PATH)
-	logger.info("Database connection established")
+        logger.info("Database connection established")
         yield conn
     except sqlite3.Error as e:
-	logger.error(f"Failed to connect to database: {e}")
+        logger.error(f"Failed to connect to database: {e}")
         raise e
     finally:
         if conn:

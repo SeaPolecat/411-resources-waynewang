@@ -98,23 +98,23 @@ def delete_boxer(boxer_id: int) -> None:
         ValueError: If the boxer does not exist in the database.
     """ 
 
-	logger.info(f"Attempting to delete boxer with ID {boxer_id}")
+    logger.info(f"Attempting to delete boxer with ID {boxer_id}")
    
-	try:
+    try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
 
             cursor.execute("SELECT id FROM boxers WHERE id = ?", (boxer_id,))
             if cursor.fetchone() is None:
-               logger.warning(f"Boxer with ID {boxer_id} not found")
-		 raise ValueError(f"Boxer with ID {boxer_id} not found.")
+                logger.warning(f"Boxer with ID {boxer_id} not found")
+                raise ValueError(f"Boxer with ID {boxer_id} not found.")
 
             cursor.execute("DELETE FROM boxers WHERE id = ?", (boxer_id,))
             conn.commit()
-		logger.info(f"Successfully deleted boxer with ID {boxer_id}")
+            logger.info(f"Successfully deleted boxer with ID {boxer_id}")
 
     except sqlite3.Error as e:
-	logger.error(f"Database error while deleting boxer: {e}")
+        logger.error(f"Database error while deleting boxer: {e}")
         raise e
 
 
@@ -134,7 +134,7 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
 
     """
     query = """
-        SELECT id, name, weight, height, reach, age, , wins,
+        SELECT id, name, weight, height, reach, age, fights, wins,
                (wins * 1.0 / fights) AS win_pct
         FROM boxers
         WHERE fights > 0
@@ -270,8 +270,7 @@ def get_boxer_by_name(boxer_name: str) -> Boxer:
 
 
 def get_weight_class(weight: int) -> str:
-
- """
+    """
     Determines the weight class for a boxer based on their weight.
 
     Args:
@@ -283,8 +282,7 @@ def get_weight_class(weight: int) -> str:
     Raises:
         ValueError: If the weight is below the minimum valid limit (125 lbs).
     """
-
-	logger.info(f"Determining weight class for weight: {weight}")
+    logger.info(f"Determining weight class for weight: {weight}")
 
     if weight >= 203:
         weight_class = 'HEAVYWEIGHT'
@@ -295,10 +293,10 @@ def get_weight_class(weight: int) -> str:
     elif weight >= 125:
         weight_class = 'FEATHERWEIGHT'
     else:
-	logger.error(f"Invalid weight: {weight}. Must be at least 125.")
+        logger.error(f"Invalid weight: {weight}. Must be at least 125.")
         raise ValueError(f"Invalid weight: {weight}. Weight must be at least 125.")
 
-	logger.info(f"Assigned weight class '{weight_class}' for weight: {weight}")
+    logger.info(f"Assigned weight class '{weight_class}' for weight: {weight}")
     return weight_class
 
 

@@ -342,3 +342,29 @@ def test_update_boxer_stats_invalid_result(mock_cursor):
         boxer_id = 1
         result = 'and they both died'
         update_boxer_stats(boxer_id, result)
+
+
+def test_get_boxer_by_id_returns_boxer(mock_cursor):
+    """
+    Test that get_boxer_by_id successfully returns a Boxer object when found.
+    """
+    fake_row = (1, "Ali", 180, 70, 75.0, 28)
+    mock_cursor.fetchone.return_value = fake_row
+
+    boxer = get_boxer_by_id(1)
+
+    assert isinstance(boxer, Boxer)
+    assert boxer.id == 1
+    assert boxer.name == "Ali"
+    assert boxer.weight == 180
+
+
+def test_get_boxer_by_id_not_found(mock_cursor):
+    """
+    Test that get_boxer_by_id raises a ValueError when boxer is not found.
+    """
+    mock_cursor.fetchone.return_value = None
+
+    with pytest.raises(ValueError, match="Boxer with ID 1 not found."):
+        get_boxer_by_id(1)
+
