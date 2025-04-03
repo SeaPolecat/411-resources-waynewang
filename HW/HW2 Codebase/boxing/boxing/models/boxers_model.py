@@ -284,6 +284,8 @@ def get_weight_class(weight: int) -> str:
         ValueError: If the weight is below the minimum valid limit (125 lbs).
     """
 
+	logger.info(f"Determining weight class for weight: {weight}")
+
     if weight >= 203:
         weight_class = 'HEAVYWEIGHT'
     elif weight >= 166:
@@ -293,8 +295,10 @@ def get_weight_class(weight: int) -> str:
     elif weight >= 125:
         weight_class = 'FEATHERWEIGHT'
     else:
+	logger.error(f"Invalid weight: {weight}. Must be at least 125.")
         raise ValueError(f"Invalid weight: {weight}. Weight must be at least 125.")
 
+	logger.info(f"Assigned weight class '{weight_class}' for weight: {weight}")
     return weight_class
 
 
