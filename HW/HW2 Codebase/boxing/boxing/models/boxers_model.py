@@ -97,6 +97,8 @@ def delete_boxer(boxer_id: int) -> None:
     Raises:
         ValueError: If the boxer does not exist in the database.
     """ 
+
+	logger.info(f"Attempting to delete boxer with ID {boxer_id}")
    
 	try:
         with get_db_connection() as conn:
@@ -104,12 +106,15 @@ def delete_boxer(boxer_id: int) -> None:
 
             cursor.execute("SELECT id FROM boxers WHERE id = ?", (boxer_id,))
             if cursor.fetchone() is None:
-                raise ValueError(f"Boxer with ID {boxer_id} not found.")
+               logger.warning(f"Boxer with ID {boxer_id} not found")
+		 raise ValueError(f"Boxer with ID {boxer_id} not found.")
 
             cursor.execute("DELETE FROM boxers WHERE id = ?", (boxer_id,))
             conn.commit()
+		logger.info(f"Successfully deleted boxer with ID {boxer_id}")
 
     except sqlite3.Error as e:
+	logger.error(f"Database error while deleting boxer: {e}")
         raise e
 
 
@@ -181,21 +186,21 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
 
 
 def get_boxer_by_id(boxer_id: int) -> Boxer:
-        """Retrieves a song from the playlist by its song ID.
-        
-        Args:
-            song_id (int): The ID of the song to retrieve.
-        
-        Returns:
-            Song: The song with the specified ID.
-        
-        Raises:
-            ValueError: If the playlist is empty or the song is not found.
-            
-        """
+    """
+    Retrieves a boxer from the database by their boxer ID.
 
-    
-	try:
+    Args:
+        boxer_id (int): The ID of the boxer to retrieve.
+
+    Returns:
+        Boxer: The boxer with the specified ID.
+
+    Raises:
+        ValueError: If the boxer is not found in the database.
+    """
+    logger.info(f"Fetching boxer with ID {boxer_id}")
+
+    try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -206,21 +211,24 @@ def get_boxer_by_id(boxer_id: int) -> Boxer:
             row = cursor.fetchone()
 
             if row:
+                logger.info(f"Boxer with ID {boxer_id} found: {row[1]}")
                 boxer = Boxer(
                     id=row[0], name=row[1], weight=row[2], height=row[3],
                     reach=row[4], age=row[5]
                 )
                 return boxer
             else:
+                logger.warning(f"Boxer with ID {boxer_id} not found")
                 raise ValueError(f"Boxer with ID {boxer_id} not found.")
 
     except sqlite3.Error as e:
+        logger.error(f"Database error while fetching boxer: {e}")
         raise e
+
 
 
 def get_boxer_by_name(boxer_name: str) -> Boxer:
     """Gets a boxer by their name.
-
     Args:
         boxer_name (str): The boxer's name.
 
