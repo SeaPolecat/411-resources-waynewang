@@ -368,3 +368,22 @@ def test_get_boxer_by_id_not_found(mock_cursor):
     with pytest.raises(ValueError, match="Boxer with ID 1 not found."):
         get_boxer_by_id(1)
 
+
+def test_delete_boxer_stub():
+    """Stub test for delete_boxer"""
+    assert True
+
+
+def test_enter_ring_stub():
+    """Stub test for entering the ring"""
+    assert True
+
+
+def test_fight_boxers_stub():
+    """Stub test for simulating a fight"""
+    assert True
+
+
+def test_check_database_connection_stub():
+    """Stub test for checking DB connection"""
+    assert True
